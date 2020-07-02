@@ -1,19 +1,17 @@
-package Board;
-import java.util.Set;
-import java.util.TreeSet;
+package board;
 import java.util.Vector;
 
 import game.Game;
 
 public class GameBoard {
 	private GamePiece[][] gamePieces;
-	private Set<GamePiece> allPieces;
+	private Vector<GamePiece> allPieces;
 	private int size;
 	
 	public GameBoard(int size, Game game, Vector<int[]> initialPieces) {
 		this.size = size;
 		gamePieces = new GamePiece[size][size];
-		allPieces = new TreeSet<GamePiece>();
+		allPieces = new Vector<GamePiece>();
 		for (int[] indexes_TagId_PlayerId: initialPieces) {
 			int[] indexes = {indexes_TagId_PlayerId[0], indexes_TagId_PlayerId[1]};
 			setPieceTo(indexes, new GamePiece(indexes_TagId_PlayerId[2], indexes_TagId_PlayerId[3], indexes, this));
@@ -52,7 +50,7 @@ public class GameBoard {
 				if (gamePieces[y][x]==null) {
 					System.out.print(".. ");
 				} else {
-					System.out.print(String.format("%s%d ", (getPieceIn(x, y).player==0?"A":"B"), getPieceIn(x, y).tagId));
+					System.out.print(String.format("%s%d ", (getPieceIn(x, y).getPlayerId()==0?"A":"B"), getPieceIn(x, y).tagId));
 				}
 			}
 			System.out.println();
@@ -81,5 +79,9 @@ public class GameBoard {
 	
 	public int getNumberOfPiecesOnTheBoard() {
 		return allPieces.size();
+	}
+	
+	public Vector<GamePiece> getAllPieces() {
+		return allPieces;
 	}
 }

@@ -1,10 +1,8 @@
-package Board;
+package board;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Vector;
 
-public class GamePiece implements Comparable<GamePiece>{
+public class GamePiece {
 	public static String[] tags;
 	int tagId;
 	static int lastId;
@@ -13,7 +11,7 @@ public class GamePiece implements Comparable<GamePiece>{
 	public static Map<Integer, Vector<int[]>> pieceMovements; //from tag to all possible moves. Example move {1,1}
 	int[] positionIndexes;
 	
-	int player;
+	private int player;
 	GameBoard gameBoard;	
 	
 	GamePiece(int tagId, int player, int[] positionIndexes, GameBoard gameBoard) {
@@ -25,8 +23,8 @@ public class GamePiece implements Comparable<GamePiece>{
 	}
 	
 	boolean CanEatEnemyPiece = true;
-	public final Set<Move> getPossibleMovesForPiece() {
-		Set<Move> possibleMoves = new TreeSet<Move>();
+	public final Vector<Move> getPossibleMovesForPiece() {
+		Vector<Move> possibleMoves = new Vector<Move>();
 		for (int[] move: pieceMovements.get(tagId)) {
 			int[] newIndexes = {positionIndexes[0] + move[0], positionIndexes[1] + move[1]};
 			
@@ -59,7 +57,19 @@ public class GamePiece implements Comparable<GamePiece>{
 	public String toString() {
 		return tags[tagId];
 	}
-
+	
+	public boolean equals(Object other) {
+		if (other instanceof GamePiece) {
+			GamePiece otherGp = (GamePiece) other;
+			return otherGp.pieceId == pieceId;
+		}
+		return false;
+	}
+	
+	public int getPlayerId() {
+		return player;
+	}
+	/*
 	@Override
 	public int compareTo(GamePiece other) {
 		return (player-other.player)*1000+
@@ -67,4 +77,5 @@ public class GamePiece implements Comparable<GamePiece>{
 				(positionIndexes[0]-other.positionIndexes[0])*10+
 				(positionIndexes[1]-other.positionIndexes[1]);
 	}
+	*/
 }

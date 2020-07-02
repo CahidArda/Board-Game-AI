@@ -1,6 +1,6 @@
-package Board;
+package board;
 
-public class Move implements Comparable<Move> {
+public class Move {
 	GamePiece pieceToMove;
 	int[] to;
 	
@@ -25,6 +25,7 @@ public class Move implements Comparable<Move> {
 		return false;
 	}
 
+	/*
 	@Override
 	public int compareTo(Move other) {
 		return (pieceToMove.positionIndexes[0]-other.pieceToMove.positionIndexes[0])*1000+
@@ -32,6 +33,7 @@ public class Move implements Comparable<Move> {
 				(to[0]-other.to[0])*10+
 				(to[1]-other.to[1]);
 	}
+	*/
 	
 	
 }

@@ -1,7 +1,6 @@
 package game;
 
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 public class EightPawnGame extends Game {
@@ -46,6 +45,6 @@ public class EightPawnGame extends Game {
 		tags[0] = "pawn";
 		return tags;
 	}
-	
+
 	
 }
