@@ -1,26 +1,22 @@
-import java.util.HashSet;
+package Board;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
+
+import game.Game;
 
 public class GameBoard {
 	private GamePiece[][] gamePieces;
 	private Set<GamePiece> allPieces;
 	private int size;
-	private Game game;
 	
-	GameBoard(int size, Game game) {
+	public GameBoard(int size, Game game, Vector<int[]> initialPieces) {
 		this.size = size;
 		gamePieces = new GamePiece[size][size];
-		allPieces = new HashSet<GamePiece>();
-		this.game = game;
-		fillBoard();
-	}
-	
-	private void fillBoard() {
-		for (int x=0; x<size; x++) {
-			int[] is1 = {x, size-2};
-			setPieceTo(is1, new GamePiece(0, 0, is1, game));
-			int[] is2 = {x, 1};
-			setPieceTo(is2, new GamePiece(0, 1, is2, game));
+		allPieces = new TreeSet<GamePiece>();
+		for (int[] indexes_TagId_PlayerId: initialPieces) {
+			int[] indexes = {indexes_TagId_PlayerId[0], indexes_TagId_PlayerId[1]};
+			setPieceTo(indexes, new GamePiece(indexes_TagId_PlayerId[2], indexes_TagId_PlayerId[3], indexes, this));
 		}
 	}
 	
@@ -28,14 +24,16 @@ public class GameBoard {
 		if(!move.pieceToMove.getPossibleMovesForPiece().contains(move)) {
 	        throw new IllegalArgumentException("Given move is not possible");
 	    }
-		setPieceTo(move.to, move.pieceToMove);
+		
+		if (getPieceIn(move.to)!=null) {
+			allPieces.remove(getPieceIn(move.to));
+		}
+		gamePieces[move.pieceToMove.positionIndexes[1]][move.pieceToMove.positionIndexes[0]] = null;
+		gamePieces[move.to[1]][move.to[0]] = move.pieceToMove;
+		move.pieceToMove.positionIndexes = move.to;
 	}
 	
 	private void setPieceTo(int[] indexes, GamePiece gp) {
-		
-		if (getPieceIn(indexes) != null) { //no piece in target position
-			allPieces.remove(getPieceIn(indexes));
-		}
 		if (!allPieces.contains(gp)) {
 			allPieces.add(gp);
 		}
@@ -79,5 +77,9 @@ public class GameBoard {
 	public GamePiece getPieceIn(int x, int y) {
 		assert (indexesAreWithinGameBoard(x,y)) : String.format("index out of range: %d, %d", x, y);
 		return gamePieces[y][x];
+	}
+	
+	public int getNumberOfPiecesOnTheBoard() {
+		return allPieces.size();
 	}
 }
