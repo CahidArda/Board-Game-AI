@@ -3,6 +3,8 @@ package game;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import board.GamePiece;
+
 public class EightPawnGame extends Game {
 	public EightPawnGame(int size) {
 		super(size);
@@ -26,15 +28,15 @@ public class EightPawnGame extends Game {
 	}
 
 	//{x, y, tagId, player}
-	Vector<int[]> setInitialPieces() {
-		int yOffset = 1;
-		Vector<int[]> v = new Vector<int[]>(); 
+	Vector<GamePiece> setInitialPieces() {
+		int yOffset = 0;
+		Vector<GamePiece> v = new Vector<GamePiece>(); 
 		for (int x = 0; x < super.size; x++) {
-			int[] i1 = {x, yOffset, 0, 0};
-			v.add(i1);
+			int[] p1 = {x, yOffset};
+			v.add(new GamePiece(0, 0, p1));
 			
-			int[] i2 = {x, size-yOffset-1, 0, 1};
-			v.add(i2);
+			int[] p2 = {x, size-yOffset-1};
+			v.add(new GamePiece(0,1,p2));
 		}
 		return v;
 	}
@@ -44,6 +46,15 @@ public class EightPawnGame extends Game {
 		String[] tags = new String[1];
 		tags[0] = "pawn";
 		return tags;
+	}
+
+	@Override
+	public int[] getScores() {
+		int[] scores = new int[2];
+		for (GamePiece gp: super.gameBoard.getAllPieces()) {
+			scores[gp.getPlayerId()] += 1;
+		}
+		return scores;
 	}
 
 	
