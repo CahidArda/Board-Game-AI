@@ -1,28 +1,29 @@
 package board;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Vector;
 
 public class GamePiece {
 	public static String[] tags;
-	int tagId;
+	private int tagId;
 	static int lastId;
-	int pieceId;
+	private int pieceId;
 	
 	public static Map<Integer, Vector<int[]>> pieceMovements; //from tag to all possible moves. Example move {1,1}
-	int[] positionIndexes;
+	private int[] positionIndexes;
 	
 	private int player;
 	GameBoard gameBoard;	
 	
-	GamePiece(int tagId, int player, int[] positionIndexes, GameBoard gameBoard) {
+	public GamePiece(int tagId, int player, int[] positionIndexes) {
 		pieceId = lastId++;
 		this.tagId = tagId;
 		this.player = player;
 		this.positionIndexes = positionIndexes;
-		this.gameBoard = gameBoard;
+		this.gameBoard = null;
 	}
 	
-	boolean CanEatEnemyPiece = true;
+	private boolean CanEatEnemyPiece = true;
 	public final Vector<Move> getPossibleMovesForPiece() {
 		Vector<Move> possibleMoves = new Vector<Move>();
 		for (int[] move: pieceMovements.get(tagId)) {
@@ -55,7 +56,9 @@ public class GamePiece {
 	
 	//TODO more informative
 	public String toString() {
-		return tags[tagId];
+		
+		return Arrays.toString(positionIndexes);
+		//return tags[tagId];
 	}
 	
 	public boolean equals(Object other) {
@@ -66,16 +69,23 @@ public class GamePiece {
 		return false;
 	}
 	
+	protected void setPositionIndexes(int[] positionIndexes) {
+		this.positionIndexes = positionIndexes;
+	}
+	
+	protected int[] getPositionIndexes() {
+		return positionIndexes;
+	}
+	
+	protected int getTagId() {
+		return tagId;
+	}
+	
 	public int getPlayerId() {
 		return player;
 	}
-	/*
-	@Override
-	public int compareTo(GamePiece other) {
-		return (player-other.player)*1000+
-				(pieceId-other.pieceId)*100+
-				(positionIndexes[0]-other.positionIndexes[0])*10+
-				(positionIndexes[1]-other.positionIndexes[1]);
+	
+	public int getPieceId() {
+		return pieceId;
 	}
-	*/
 }

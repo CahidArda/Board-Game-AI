@@ -2,38 +2,34 @@ package board;
 
 public class Move {
 	GamePiece pieceToMove;
+	int[] from;
 	int[] to;
 	
-	private static int lastId = 0;
-	private int moveId;
-	
 	public Move(GamePiece pieceToMove, int[] to) {
-		moveId = lastId++;
 		this.pieceToMove = pieceToMove;
+		from = new int[2];
+		from[0] = pieceToMove.getPositionIndexes()[0];
+		from[1] = pieceToMove.getPositionIndexes()[1];
 		this.to = to;
 	}
 	
 	public String toString() {
-		return String.format("Moving %s, from (%d, %d) to (%d, %d)", pieceToMove.tags[pieceToMove.tagId], pieceToMove.positionIndexes[0], pieceToMove.positionIndexes[1], to[0], to[1]);
+		return String.format("Moving %s, from (%d, %d) to (%d, %d)", pieceToMove.tags[pieceToMove.getTagId()], from[0], from[1], to[0], to[1]);
+	}
+	
+	public int hashCode() {
+		return from[0]*10000 +
+			from[1]*1000+
+			to[0]*100+
+			to[1]*10+
+			pieceToMove.getPieceId();
 	}
 	
 	public boolean equals(Object other){
 		if (other instanceof Move) {
 			Move m = (Move) other;
-			return (m.pieceToMove.pieceId == pieceToMove.pieceId && m.to[0] == to[0] && m.to[1] == to[1]);
+			return (m.pieceToMove.getPieceId() == pieceToMove.getPieceId() && m.to[0] == to[0] && m.to[1] == to[1]);
 		}
 		return false;
-	}
-
-	/*
-	@Override
-	public int compareTo(Move other) {
-		return (pieceToMove.positionIndexes[0]-other.pieceToMove.positionIndexes[0])*1000+
-				(pieceToMove.positionIndexes[1]-other.pieceToMove.positionIndexes[1])*100+
-				(to[0]-other.to[0])*10+
-				(to[1]-other.to[1]);
-	}
-	*/
-	
-	
+	}	
 }
