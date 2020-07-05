@@ -3,6 +3,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Vector;
 
+/**
+ * Used to represent all the game pieces on the board
+ * @author cahid
+ *
+ */
 public class GamePiece {
 	public static String[] tags;
 	private int tagId;
@@ -15,6 +20,12 @@ public class GamePiece {
 	private int player;
 	GameBoard gameBoard;	
 	
+	/**
+	 * 
+	 * @param tagId tag of the GamePiece, describing the possible moves and the name of the piece
+	 * @param player Id of the player controlling the piece
+	 * @param positionIndexes initial position indexes of the gamePiece
+	 */
 	public GamePiece(int tagId, int player, int[] positionIndexes) {
 		pieceId = lastId++;
 		this.tagId = tagId;
@@ -24,6 +35,11 @@ public class GamePiece {
 	}
 	
 	private boolean CanEatEnemyPiece = true;
+	/**
+	 * Used to get all possible moves of a piece
+	 * Eating the enemy pieces can be disabled or enabled from source code
+	 * @return Vector with all possible moves of the piece
+	 */
 	public final Vector<Move> getPossibleMovesForPiece() {
 		Vector<Move> possibleMoves = new Vector<Move>();
 		for (int[] move: pieceMovements.get(tagId)) {
@@ -69,22 +85,42 @@ public class GamePiece {
 		return false;
 	}
 	
+	/**
+	 * Used to set the position indexes of the piece
+	 * @param positionIndexes new indexes to be set to the piece
+	 */
 	protected void setPositionIndexes(int[] positionIndexes) {
 		this.positionIndexes = positionIndexes;
 	}
 	
-	protected int[] getPositionIndexes() {
+	/**
+	 * Used to get the position indexes of the piece
+	 * @return position indexes of the piece
+	 */
+	public int[] getPositionIndexes() {
 		return positionIndexes;
 	}
 	
+	/**
+	 * Used to get the tagId of the GamePiece, describing the possible moves and the name of the piece
+	 * @return tagId of the GamaPiece
+	 */
 	protected int getTagId() {
 		return tagId;
 	}
 	
+	/**
+	 * Used to get the player of the GamePiece
+	 * @return player Id of the piece
+	 */
 	public int getPlayerId() {
 		return player;
 	}
 	
+	/**
+	 * Used to get the distinctive id of the GamePiece 
+	 * @return piece id
+	 */
 	public int getPieceId() {
 		return pieceId;
 	}
