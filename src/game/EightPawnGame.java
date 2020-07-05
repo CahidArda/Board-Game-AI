@@ -32,6 +32,10 @@ public class EightPawnGame extends Game {
 		int yOffset = 0;
 		Vector<GamePiece> v = new Vector<GamePiece>(); 
 		for (int x = 0; x < super.size; x++) {
+			/*
+			if (x==1) { 	//TODO remove
+				continue;
+			} */
 			int[] p1 = {x, yOffset};
 			v.add(new GamePiece(0, 0, p1));
 			
@@ -52,7 +56,15 @@ public class EightPawnGame extends Game {
 	public int[] getScores() {
 		int[] scores = new int[2];
 		for (GamePiece gp: super.gameBoard.getAllPieces()) {
-			scores[gp.getPlayerId()] += 1;
+			if (gp.getPlayerId()==0) {
+				scores[0]+=10;
+				scores[0]+=(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
+				scores[1]-=(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
+			} else {
+				scores[1]+=10;
+				scores[1]+=(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
+				scores[0]-=(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
+			}
 		}
 		return scores;
 	}
