@@ -1,11 +1,7 @@
 package board;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 import java.util.Vector;
-
-import game.Game;
 
 /**
  * Used to represent the game board.
@@ -13,10 +9,8 @@ import game.Game;
  *
  */
 public class GameBoard {
-	private GamePiece[][] gamePieces;
-	private  Vector<GamePiece> allPieces;
-	private  Stack<Move> pastMoves;
-	private  Map<Move, GamePiece> removedPieces;
+	public  Vector<GamePiece> allPiecesOnTheBoard;
+	public  Stack<Move> pastMoves;
 	private int size;
 	private int nofMovesPlayedOnTheBoard;
 	private Random r;
@@ -28,63 +22,68 @@ public class GameBoard {
 	 */
 	public GameBoard(int size, Vector<GamePiece> initialPieces) {
 		this.size = size;
-		gamePieces = new GamePiece[size][size];
-		allPieces = new Vector<GamePiece>();
+		//gamePieces = new GamePiece[size][size];
+		allPiecesOnTheBoard = new Vector<GamePiece>();
 		pastMoves = new Stack<Move>();
-		removedPieces = new HashMap<Move, GamePiece>();
 		for (GamePiece gp: initialPieces) {
 			setPieceTo(gp.getPositionIndexes(), gp);
-			gp.gameBoard = this;
 		}
 		r = new Random(0);
 		nofMovesPlayedOnTheBoard = 0;
 	}
 	
 	/**
-	 * Updates the gameBoard object with a move.
 	 * Checks if the move is plausible, gives error if it isn't.
+	 * Makes necessary updates when a move is implemented.
 	 * @param move Move being implemented
 	 */
 	public void updateWithMove(Move move) {
-		if(!move.pieceToMove.getPossibleMovesForPiece().contains(move)) {
-			printGameBoardToConsole();
+		if (!indexesAreWithinGameBoard(move.getTo()) || !indexesAreWithinGameBoard(move.getFrom())) {
 			System.out.println(move);
-			System.out.println("stats:");
-			System.out.println(allPieces.size());
-			System.out.println(pastMoves.size());
-			System.out.println(removedPieces.size());
-	        throw new IllegalArgumentException("Given move is not possible");
-	        
-	    }
-		pastMoves.add(move);
-		if (getPieceIn(move.to)!=null) {
-			allPieces.remove(getPieceIn(move.to));
-			removedPieces.put(move, getPieceIn(move.to));
+			throw new IllegalArgumentException("Move's indexes are not within the ranges.");
 		}
-		gamePieces[move.from[1]][move.from[0]] = null;
-		gamePieces[move.to[1]][move.to[0]] = move.pieceToMove;
-		move.pieceToMove.setPositionIndexes(move.to);
+		//update piece at move.to
+		GamePiece gp = getPieceIn(move.getTo());
+		if (gp!=null) {
+			allPiecesOnTheBoard.remove(gp);
+			gp.setPositionIndexes(null);
+		}
+		//update move
+		move.updateAfterImplementation(gp);
+		pastMoves.add(move);
+		//update piece at move.from
+		gp = getPieceIn(move.getFrom());
+		if (!getPossibleMovesForPiece(gp).contains(move)) {
+			System.out.println(move);
+			throw new IllegalArgumentException("Given move is impossible to implement");
+		}
+		gp.setPositionIndexes(move.getTo());
 		nofMovesPlayedOnTheBoard++;
 	}
 	
 	/**
-	 * Reverses the last move played.
+	 * Makes the necessary updates to reverse a move
 	 */
 	public void reverseMove() {		
 		Move move = pastMoves.pop();
-		
-		gamePieces[move.to[1]][move.to[0]] = null;
-		for (Move m: removedPieces.keySet()) {
-			if (m.getMoveId() == move.getMoveId()) {
-				setPieceTo(m.to, removedPieces.get(m));
-				removedPieces.remove(m);
-				break;
-			}
+		if (getPieceIn(move.getFrom())!=null) {
+			throw new IllegalStateException("There can not be a piece at move.from when reversing a move.");
+		} else if (getPieceIn(move.getTo())==null) {
+			throw new IllegalStateException("There must be a piece at move.to when reversing a move.");
 		}
-		gamePieces[move.from[1]][move.from[0]] = move.pieceToMove;
-		move.pieceToMove.setPositionIndexes(move.from);
-		nofMovesPlayedOnTheBoard--;
+		//move object from move.to to move.from
+		GamePiece gp = getPieceIn(move.getTo());
+		gp.setPositionIndexes(move.getFrom());
+		//bring back the removed piece if there is one
+		if (move.hasRemovedPiece()) {
+			gp = move.getRemovedPieceAfterImplementation();
+			gp.setPositionIndexes(move.getTo());
+			allPiecesOnTheBoard.add(gp);
+		}
+		nofMovesPlayedOnTheBoard--;	
 	}
+	
+	
 	
 	/**
 	 * Used to set the pieces to their positions on the gamePieces array and
@@ -92,11 +91,10 @@ public class GameBoard {
 	 * @param indexes indexes of the 
 	 * @param gp
 	 */
-	private void setPieceTo(int[] indexes, GamePiece gp) {
-		if (!allPieces.contains(gp)) {
-			allPieces.add(gp);
-		}
-		gamePieces[indexes[1]][indexes[0]] = gp;
+	private void setPieceTo(int[] to, GamePiece gp) {
+		allPiecesOnTheBoard.add(gp);
+		gp.setPositionIndexes(to);
+		
 	}
 	
 	/**
@@ -105,7 +103,7 @@ public class GameBoard {
 	public Vector<Move> getAllMoves() {
 		Vector<Move> allMoves = new Vector<Move>();
 		for (GamePiece gp: getAllPieces() ) {
-			allMoves.addAll(gp.getPossibleMovesForPiece());
+			allMoves.addAll(getPossibleMovesForPiece(gp));
 		}
 		return allMoves;
 	}
@@ -118,7 +116,7 @@ public class GameBoard {
 		Vector<Move> allMoves = new Vector<Move>();
 		for (GamePiece gp: getAllPieces() ) {
 			if (gp.getPlayerId()==playerId)
-				allMoves.addAll(gp.getPossibleMovesForPiece());
+				allMoves.addAll(getPossibleMovesForPiece(gp));
 		}
 		return allMoves;
 	}
@@ -142,6 +140,42 @@ public class GameBoard {
 		updateWithMove(getRandomMove(playerId));
 	}
 	
+	private boolean CanEatEnemyPiece = false;
+	/**
+	 * Used to get all possible moves of a piece
+	 * Eating the enemy pieces can be disabled or enabled from source code
+	 * @return Vector with all possible moves of the piece
+	 */
+	public final Vector<Move> getPossibleMovesForPiece(GamePiece gp) {
+		Vector<Move> possibleMoves = new Vector<Move>();
+		for (int[] move: gp.getPieceMovements()) {
+			int[] newIndexes = {gp.getPositionIndexes()[0] + move[0], gp.getPositionIndexes()[1] + move[1]};
+			
+			//out of the map, pass
+			if (!indexesAreWithinGameBoard(newIndexes)) {
+				continue;
+			}
+			
+			GamePiece gpInGivenIndex = getPieceIn(newIndexes);
+			
+			if (gpInGivenIndex==null) {
+				possibleMoves.add(new Move(gp.getPositionIndexes(), newIndexes));
+			} else {
+				
+				//own piece in the new index, pass
+				if (gp.getPlayerId() == gpInGivenIndex.getPlayerId()) {
+					continue;
+				}
+				
+				//enemy piece in the new index, add if eating is enabled
+				if (CanEatEnemyPiece && gp.getPlayerId()!=gpInGivenIndex.getPlayerId()) {
+					possibleMoves.add(new Move(gp.getPositionIndexes(), newIndexes));
+				}
+			}	
+		}
+		return possibleMoves;
+	}
+	
 	/**
 	 * GameBoard's (private gamePieces array) content is printed to console.
 	 * Pieces owned by the player with id 0 are shown with 'A',
@@ -153,18 +187,29 @@ public class GameBoard {
 			System.out.print("  " + i);
 		}
 		System.out.println();
+		String[][] str = new String[size][size];
+		for (GamePiece gp: allPiecesOnTheBoard) {
+			int x = gp.getPositionIndexes()[0];
+			int y = gp.getPositionIndexes()[1];
+			if (str[y][x]!=null) {
+				throw new IllegalStateException("Two gamePieces can not have the same indexes");
+			}
+			str[y][x] = String.format("%s%d ", (getPieceIn(x, y).getPlayerId()==0?"A":"B"), getPieceIn(x, y).getTagId());
+			
+		}
 		for (int y=0; y<size; y++) {
 			System.out.print(y + "   ");
 			for (int x=0; x<size; x++) {
-				if (gamePieces[y][x]==null) {
+				if (str[y][x]==null) {
 					System.out.print(".. ");
 				} else {
-					System.out.print(String.format("%s%d ", (getPieceIn(x, y).getPlayerId()==0?"A":"B"), getPieceIn(x, y).getTagId()));
+					System.out.print(str[y][x]);
 				}
 			}
 			System.out.println();
 		}
-		System.out.println(getNofMovesPlayedOnTheBoard());
+		System.out.println("Moves played: " + getNofMovesPlayedOnTheBoard());
+		System.out.println("Number of pieces: " + getNumberOfPiecesOnTheBoard());
 	}
 	
 	/**
@@ -201,10 +246,7 @@ public class GameBoard {
 	 * @return GamePiece object at the given indexes
 	 */
 	public GamePiece getPieceIn(int[] indexes) {
-		if(!indexesAreWithinGameBoard(indexes)) {
-	        throw new IllegalArgumentException(String.format("index out of range: %d, %d", indexes[0], indexes[1]));
-		}
-		return gamePieces[indexes[1]][indexes[0]];
+		return getPieceIn(indexes[0], indexes[1]);
 	}
 	
 	/**
@@ -218,7 +260,12 @@ public class GameBoard {
 		if(!indexesAreWithinGameBoard(x,y)) {
 	        throw new IllegalArgumentException(String.format("index out of range: %d, %d", x, y));
 		}
-		return gamePieces[y][x];
+		for (GamePiece gp: allPiecesOnTheBoard) {
+			if (x==gp.getPositionIndexes()[0] && y==gp.getPositionIndexes()[1]) {
+				return gp;
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -226,7 +273,7 @@ public class GameBoard {
 	 * @return number of pieces on the board
 	 */
 	public int getNumberOfPiecesOnTheBoard() {
-		return allPieces.size();
+		return allPiecesOnTheBoard.size();
 	}
 	
 	/**
@@ -234,7 +281,7 @@ public class GameBoard {
 	 * @return vector with all the gamePieces
 	 */
 	public Vector<GamePiece> getAllPieces() {
-		return allPieces;
+		return allPiecesOnTheBoard;
 	}
 	
 	/**

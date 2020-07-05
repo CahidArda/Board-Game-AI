@@ -18,7 +18,6 @@ public class GamePiece {
 	private int[] positionIndexes;
 	
 	private int player;
-	GameBoard gameBoard;	
 	
 	/**
 	 * 
@@ -31,44 +30,9 @@ public class GamePiece {
 		this.tagId = tagId;
 		this.player = player;
 		this.positionIndexes = positionIndexes;
-		this.gameBoard = null;
 	}
 	
-	private boolean CanEatEnemyPiece = true;
-	/**
-	 * Used to get all possible moves of a piece
-	 * Eating the enemy pieces can be disabled or enabled from source code
-	 * @return Vector with all possible moves of the piece
-	 */
-	public final Vector<Move> getPossibleMovesForPiece() {
-		Vector<Move> possibleMoves = new Vector<Move>();
-		for (int[] move: pieceMovements.get(tagId)) {
-			int[] newIndexes = {positionIndexes[0] + move[0], positionIndexes[1] + move[1]};
-			
-			//out of the map, pass
-			if (!gameBoard.indexesAreWithinGameBoard(newIndexes)) {
-				continue;
-			}
-			
-			GamePiece gpInGivenIndex = gameBoard.getPieceIn(newIndexes);
-			
-			if (gpInGivenIndex==null) {
-				possibleMoves.add(new Move(this, newIndexes));
-			} else {
-				
-				//own piece in the new index, pass
-				if (player == gpInGivenIndex.player) {
-					continue;
-				}
-				
-				//enemy piece in the new index, add if eating is enabled
-				if (CanEatEnemyPiece && player!=gpInGivenIndex.player) {
-					possibleMoves.add(new Move(this, newIndexes));
-				}
-			}	
-		}
-		return possibleMoves;
-	}
+	
 	
 	//TODO more informative
 	public String toString() {
@@ -99,6 +63,10 @@ public class GamePiece {
 	 */
 	public int[] getPositionIndexes() {
 		return positionIndexes;
+	}
+	
+	public Vector<int[]> getPieceMovements() {
+		return pieceMovements.get(tagId);
 	}
 	
 	/**
