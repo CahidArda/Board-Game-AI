@@ -29,14 +29,16 @@ public abstract class Game {
 		GamePiece.tags = setTags();
 	}
 	
+	/**
+	 * Used to initiate a monte-carlo-search-tree to find a good move
+	 * @param searchDepth Depth of the move search tree
+	 * @return Score maximizing move
+	 */
 	public Move getBestMoveForNextPlayer(int searchDepth) {
 		int highestScore = -10000;
 		Move[] bestMove = new Move[1];
 		int nextPlayerId = gameBoard.getNextPlayerId();
 		for (Move m: gameBoard.getAllMoves(nextPlayerId)) {
-			
-			//System.out.println("-----###----- -----###----- -----###-----");
-			//gameBoard.printGameBoardToConsole();
 			
 			gameBoard.updateWithMove(m);
 			int mScore = getMoveScore(2, nextPlayerId, searchDepth);
@@ -46,7 +48,6 @@ public abstract class Game {
 			}
 			gameBoard.reverseMove();
 			
-			//gameBoard.printGameBoardToConsole();
 		}
 		return bestMove[0];
 	}
@@ -54,10 +55,6 @@ public abstract class Game {
 	private int getMoveScore(int currentDepth, int playerId, int searchDepth) {
 		int scoreSum = 0;
 		for (Move m: gameBoard.getAllMoves(gameBoard.getNextPlayerId())) {
-			
-			//System.out.println("              -----###-----");
-			//gameBoard.printGameBoardToConsole();
-			
 			gameBoard.updateWithMove(m);
 			if (currentDepth==searchDepth) {
 				scoreSum+=getScores()[playerId];
@@ -65,10 +62,24 @@ public abstract class Game {
 				scoreSum+=getMoveScore(currentDepth+1, playerId, searchDepth);
 			}
 			gameBoard.reverseMove();
-			
-			//gameBoard.printGameBoardToConsole();
 		}
 		return scoreSum;
+	}
+	
+	/**
+	 * Used to check whether the updating-reversing loop works by making random moves.
+	 * @param nofBranches Number of child nodes of every node
+	 * @param treeDepth Depth of the seatch tree
+	 * @param currentDepth Used to keep track of depth of the recursive call. Should be set to 0 by default when calling the method. 
+	 */
+	public void runRandomMoveTree(int nofBranches, int treeDepth, int currentDepth) {
+		if (currentDepth<treeDepth) {
+			for (int i=0; i<nofBranches; i++) {
+				gameBoard.makeRandomMove(gameBoard.getNextPlayerId());
+				runRandomMoveTree(nofBranches, treeDepth, currentDepth+1);
+				gameBoard.reverseMove();
+			}
+		}
 	}
 	
 
