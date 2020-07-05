@@ -1,5 +1,4 @@
 package executable;
-import java.io.ObjectInputStream.GetField;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -8,38 +7,32 @@ import board.Move;
 import game.EightPawnGame;
 import game.Game;
 
-/*
- * check move
- * 0 0 0 1 3 0 3 1
- */
 
 public class Main {
 	public static void main(String[] args) {
-		test4(1, 10, 5);
+		test4(1, 40, 5);
+		
 	}
 	
 	
 	//Move a pawn for a few rounds
 	public static void test1() {
-		Game g = new EightPawnGame(10);
+		Game g = new EightPawnGame(6);
 		g.gameBoard.printGameBoardToConsole();
 		
 		int x = 1;
-		for (int y=1; y<8; y++) {
+		for (int y=1; y<5; y++) {
 			GamePiece gp = g.gameBoard.getPieceIn(x, y);
-			int[] to = {x, y+1};
+					
+			Move m = new Move(x, y, x, y+1);
 			
 			
-			Move m = new Move(gp, to);
-			
-			
-			for (Move m1: gp.getPossibleMovesForPiece()) {
+			for (Move m1: g.gameBoard.getPossibleMovesForPiece(gp)) {
 				System.out.println(m1);
 			}
 			g.gameBoard.updateWithMove(m);
 			System.out.println();
 			g.gameBoard.printGameBoardToConsole();
-			System.out.println(g.gameBoard.getNumberOfPiecesOnTheBoard());	
 		}
 	}
 	
@@ -63,35 +56,34 @@ public class Main {
 		}
 	}
 	
+	
 	//Make random moves, reverse them
 	public static void test3() {
-		Game g = new EightPawnGame(3);
+		Game g = new EightPawnGame(6);
 		g.gameBoard.printGameBoardToConsole();
 		System.out.println(Arrays.toString(g.getScores()));
-		int nofGames = 6;
-		for (int i=0; i<nofGames/2; i++) {
-			g.gameBoard.makeRandomMove(0);
-			System.out.println();
+		int nofGames = 100;
+		for (int i=0; i<nofGames; i++) {
+			g.gameBoard.makeRandomMove(g.gameBoard.getNextPlayerId());
 			g.gameBoard.printGameBoardToConsole();
-			System.out.println(Arrays.toString(g.getScores()));
-			g.gameBoard.makeRandomMove(1);
-			System.out.println();
-			g.gameBoard.printGameBoardToConsole();
-			System.out.println(Arrays.toString(g.getScores()));
+			
+			if (g.gameBoard.getNumberOfPiecesOnTheBoard()==4) {
+				System.out.println("Low number of pieces on the board");
+			}
 		}
-		System.out.println("---------######---------");
 		
 		for (int i=0; i<nofGames; i++) {
 			g.gameBoard.reverseMove();
-
-			g.gameBoard.printGameBoardToConsole();
-			System.out.println(Arrays.toString(g.getScores()));
 		}
+		g.gameBoard.printGameBoardToConsole();
+		System.out.println(g.gameBoard.allPiecesOnTheBoard.size());
+		System.out.println(g.gameBoard.pastMoves.size());
+		
 	}
 	
 	//play with AI
 	public static void test4(int idOfTheAI, int nofRoundsToPlay, int searchDepth) {
-		Game g = new EightPawnGame(4);
+		Game g = new EightPawnGame(6);
 		Scanner sc = new Scanner(System.in);
 		
 		if (idOfTheAI==0) {
@@ -100,10 +92,11 @@ public class Main {
 		
 		for (int i=0; i<nofRoundsToPlay; i++) {
 			g.gameBoard.printGameBoardToConsole();
+			System.out.println(Arrays.toString(g.getScores()));
 			int xi = sc.nextInt();
 			int yi = sc.nextInt();
-			int[] cf = {sc.nextInt(), sc.nextInt()};
-			sc.nextLine();
+			int xf = sc.nextInt();
+			int yf = sc.nextInt();
 			
 			if (g.gameBoard.getPieceIn(xi, yi)==null) {
 				System.out.println("ERROR: Invalid move, Enter another move.");
@@ -111,7 +104,7 @@ public class Main {
 				continue;
 			}
 			
-			Move m = new Move(g.gameBoard.getPieceIn(xi, yi), cf);
+			Move m = new Move(xi, yi, xf, yf);
 			
 			if (g.gameBoard.getPieceIn(xi, yi).getPlayerId()==idOfTheAI || !g.gameBoard.getAllMoves(g.gameBoard.getNextPlayerId()).contains(m)) {
 				System.out.println("ERROR: Invalid move, Enter another move.");
@@ -121,13 +114,20 @@ public class Main {
 			
 			g.gameBoard.updateWithMove(m);
 			g.gameBoard.printGameBoardToConsole();
+			System.out.println(Arrays.toString(g.getScores()));
 			Move bestMove = g.getBestMoveForNextPlayer(searchDepth);
 			g.gameBoard.updateWithMove(bestMove);
-			System.out.println("-----###-----");
-			for (GamePiece gp: g.gameBoard.getAllPieces()) {
-				System.out.println(gp);
-			}
 		}
 		sc.close();
 	}
+	
+	//calls random search tree
+	public static void test5() {
+		Game g = new EightPawnGame(8);
+		g.gameBoard.printGameBoardToConsole();
+		System.out.println();
+		g.runRandomMoveTree(5, 5, 0);
+		g.gameBoard.printGameBoardToConsole();
+	}
+	
 }
