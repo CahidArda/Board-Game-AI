@@ -29,13 +29,9 @@ public class EightPawnGame extends Game {
 
 	//{x, y, tagId, player}
 	Vector<GamePiece> setInitialPieces() {
-		int yOffset = 0;
+		int yOffset = 1;
 		Vector<GamePiece> v = new Vector<GamePiece>(); 
 		for (int x = 0; x < super.size; x++) {
-			/*
-			if (x==1) { 	//TODO remove
-				continue;
-			} */
 			int[] p1 = {x, yOffset};
 			v.add(new GamePiece(0, 0, p1));
 			
@@ -58,12 +54,14 @@ public class EightPawnGame extends Game {
 		for (GamePiece gp: super.gameBoard.getAllPieces()) {
 			if (gp.getPlayerId()==0) {
 				scores[0]+=10;
-				scores[0]+=(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
-				scores[1]-=(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
+				scores[1]-=10;
+				scores[0]+=gp.getPositionIndexes()[1]+1; //(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
+				scores[1]-=gp.getPositionIndexes()[1]+1; //(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
 			} else {
 				scores[1]+=10;
-				scores[1]+=(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
-				scores[0]-=(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
+				scores[0]-=10;
+				scores[1]+=super.size-gp.getPositionIndexes()[1]; //(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
+				scores[0]-=super.size-gp.getPositionIndexes()[1]; //(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
 			}
 		}
 		return scores;
