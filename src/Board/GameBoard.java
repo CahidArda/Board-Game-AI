@@ -81,9 +81,7 @@ public class GameBoard {
 			allPiecesOnTheBoard.add(gp);
 		}
 		nofMovesPlayedOnTheBoard--;	
-	}
-	
-	
+	}	
 	
 	/**
 	 * Used to set the pieces to their positions on the gamePieces array and
