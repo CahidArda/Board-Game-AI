@@ -55,6 +55,20 @@ public class EightPawnGame extends Game {
 			if (gp.getPlayerId()==0) {
 				scores[0]+=10;
 				scores[1]-=10;
+				scores[0]+=(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
+				scores[1]-=(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
+			} else {
+				scores[1]+=10;
+				scores[0]-=10;
+				scores[1]+=(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
+				scores[0]-=(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
+			}
+		}
+		/*
+		for (GamePiece gp: super.gameBoard.getAllPieces()) {
+			if (gp.getPlayerId()==0) {
+				scores[0]+=10;
+				scores[1]-=10;
 				scores[0]+=gp.getPositionIndexes()[1]+1; //(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
 				scores[1]-=gp.getPositionIndexes()[1]+1; //(int) Math.pow(gp.getPositionIndexes()[1]+1, 2);
 			} else {
@@ -64,6 +78,7 @@ public class EightPawnGame extends Game {
 				scores[0]-=super.size-gp.getPositionIndexes()[1]; //(int) Math.pow(super.size-gp.getPositionIndexes()[1], 2);
 			}
 		}
+		*/
 		return scores;
 	}
 

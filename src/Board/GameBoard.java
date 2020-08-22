@@ -53,10 +53,12 @@ public class GameBoard {
 		pastMoves.add(move);
 		//update piece at move.from
 		gp = getPieceIn(move.getFrom());
+		/*
 		if (!getPossibleMovesForPiece(gp).contains(move)) {
 			System.out.println(move);
 			throw new IllegalArgumentException("Given move is impossible to implement");
 		}
+		*/
 		gp.setPositionIndexes(move.getTo());
 		nofMovesPlayedOnTheBoard++;
 	}
@@ -138,7 +140,7 @@ public class GameBoard {
 		updateWithMove(getRandomMove(playerId));
 	}
 	
-	private boolean CanEatEnemyPiece = false;
+	private boolean CanEatEnemyPiece = true;
 	/**
 	 * Used to get all possible moves of a piece
 	 * Eating the enemy pieces can be disabled or enabled from source code

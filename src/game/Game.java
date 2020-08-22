@@ -60,7 +60,7 @@ public abstract class Game {
 			maxScore = (scoreBelow>maxScore? scoreBelow: maxScore);
 			gameBoard.reverseMove();
 		}
-		return maxScore;
+		return -maxScore;	//has to be minus, for the previous player
 	}
 
 	

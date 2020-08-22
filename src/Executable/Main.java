@@ -10,8 +10,7 @@ import game.Game;
 
 public class Main {
 	public static void main(String[] args) {
-		test4(1, 40, 5);
-		
+		test4(1, 40, 3);
 	}
 	
 	
