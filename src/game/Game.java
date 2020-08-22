@@ -111,4 +111,6 @@ public abstract class Game {
 	 * @return Scores of the players
 	 */
 	abstract public int[] getScores();
+	
+	abstract public void printGameSettingsToConsole();
 }

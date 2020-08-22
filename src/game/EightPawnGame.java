@@ -82,5 +82,14 @@ public class EightPawnGame extends Game {
 		return scores;
 	}
 
-	
+	@Override
+	public void printGameSettingsToConsole() {
+		System.out.println("In this game, there is only one type of piece.");
+		System.out.println("That piece can move up, down, left and right.");
+		System.out.println();
+		System.out.println("When it is your turn; type the x, y indexes of the piece you want to move.");
+		System.out.println("Then type where you want to move the piece.");
+		System.out.println();
+		
+	}
 }

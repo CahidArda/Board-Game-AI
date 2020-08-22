@@ -10,7 +10,7 @@ import game.Game;
 
 public class Main {
 	public static void main(String[] args) {
-		test4(1, 40, 3);
+		test4(0, 40, 3);
 	}
 	
 	
@@ -84,6 +84,8 @@ public class Main {
 	public static void test4(int idOfTheAI, int nofRoundsToPlay, int searchDepth) {
 		Game g = new EightPawnGame(6);
 		Scanner sc = new Scanner(System.in);
+		g.printGameSettingsToConsole();
+		System.out.println("Eating enemy pieces 'may' be enabled.");
 		
 		if (idOfTheAI==0) {
 			g.gameBoard.updateWithMove(g.getBestMoveForNextPlayer(searchDepth));
@@ -113,7 +115,7 @@ public class Main {
 			
 			g.gameBoard.updateWithMove(m);
 			g.gameBoard.printGameBoardToConsole();
-			System.out.println(Arrays.toString(g.getScores()));
+			System.out.println("Your score: " + g.getScores()[g.gameBoard.getNextPlayerId()]);
 			Move bestMove = g.getBestMoveForNextPlayer(searchDepth);
 			g.gameBoard.updateWithMove(bestMove);
 		}
@@ -123,6 +125,7 @@ public class Main {
 	//calls random search tree
 	public static void test5() {
 		Game g = new EightPawnGame(8);
+		System.out.println();
 		g.gameBoard.printGameBoardToConsole();
 		System.out.println();
 		g.runRandomMoveTree(5, 5, 0);
