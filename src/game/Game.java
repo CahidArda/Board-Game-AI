@@ -30,44 +30,42 @@ public abstract class Game {
 	}
 	
 	/**
-	 * Used to initiate a monte-carlo-search-tree to find a good move
-	 * @param searchDepth Depth of the move search tree
-	 * @return Score maximizing move
+	 * Returns best move for the next player at the current state
+	 * @return
 	 */
 	public Move getBestMoveForNextPlayer(int searchDepth) {
-		int highestScore = -10000;
 		Move[] bestMove = new Move[1];
+		int bestScore = -100000;
 		int nextPlayerId = gameBoard.getNextPlayerId();
-		for (Move m: gameBoard.getAllMoves(nextPlayerId)) {
-			
-			gameBoard.updateWithMove(m);
-			int mScore = getMoveScore(2, nextPlayerId, searchDepth);
-			if (bestMove[0]==null || highestScore<mScore) {
-				highestScore = mScore;
-				bestMove[0] = m;
+		
+		for (Move move: gameBoard.getAllMoves(nextPlayerId)) {
+			gameBoard.updateWithMove(move);
+			int scoreBelow = minMax(0, searchDepth);
+			if (bestMove[0] == null || scoreBelow>bestScore) {
+				bestScore = scoreBelow;
+				bestMove[0] = move;
 			}
 			gameBoard.reverseMove();
-			
 		}
 		return bestMove[0];
 	}
 	
-	private int getMoveScore(int currentDepth, int playerId, int searchDepth) {
-		int scoreSum = 0;
-		for (Move m: gameBoard.getAllMoves(gameBoard.getNextPlayerId())) {
+	private int minMax(int currentDepth, int searchDepth) {
+		int idOfThePlayer = gameBoard.getNextPlayerId();	//must be below updateWithMove(m)
+		int maxScore = -100000;
+		
+		for (Move m: gameBoard.getAllMoves(idOfThePlayer)) {
 			gameBoard.updateWithMove(m);
-			if (currentDepth==searchDepth) {
-				scoreSum+=getScores()[playerId];
-			} else {
-				scoreSum+=getMoveScore(currentDepth+1, playerId, searchDepth);
-			}
+			int scoreBelow = (currentDepth==searchDepth? getScores()[idOfThePlayer]: minMax(currentDepth+1, searchDepth));
+			maxScore = (scoreBelow>maxScore? scoreBelow: maxScore);
 			gameBoard.reverseMove();
 		}
-		return scoreSum;
+		return maxScore;
 	}
+
 	
 	/**
-	 * Used to check whether the updating-reversing loop works by making random moves.
+	 * Used to test whether the updating-reversing loop works by making random moves.
 	 * @param nofBranches Number of child nodes of every node
 	 * @param treeDepth Depth of the seatch tree
 	 * @param currentDepth Used to keep track of depth of the recursive call. Should be set to 0 by default when calling the method. 
